@@ -5,7 +5,7 @@
 
 - Student: Robin Wyffels
 - Studentennummer: 
-- E-mailadres: <mailto:robin.wyffels@student.hogent.be>
+- E-mailadres: <robin.wyffels@student.hogent.be>
 
 ## Vereisten
 
