@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -9,35 +9,37 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Skeleton from '@mui/material/Skeleton';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import useSWR from 'swr';
 import searchFood from '../../../api/foodApi';
 
 const theme = createTheme();
 
+const fetcher = (ingr) => searchFood(ingr);
+
 function FoodForm() {
-    const [loading, setLoading] = useState(false);
-    const [food, setFood] = useState('');
-    const [response, setResponse] = useState([]);
+    const [food, setFood] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const { data: response } = useSWR(food, fetcher);
+    const [isLoading, setIsLoading] = useState(false);
+
     const matchesSmall = useMediaQuery(theme.breakpoints.down('sm'));
     const matchesMedium = useMediaQuery(theme.breakpoints.between('md', 'lg'));
     const matchesLarge = useMediaQuery(theme.breakpoints.up('lg'));
 
     const handleChange = (event) => {
-        setFood(event.target.value);
+        setSearchTerm(event.target.value);
       };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            setLoading(true);
-            const responseData = await searchFood(food);
-            setResponse(responseData);
-            console.log(responseData);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+    const handleSearch = () => {
+        setFood(searchTerm);
+        setIsLoading(true);
     };
+
+    useEffect(() => {
+        if (response) {
+            setIsLoading(false);
+        }
+    }, [response]);
 
     let numSkeletons;
     if (matchesLarge) {
@@ -55,7 +57,7 @@ function FoodForm() {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
-            <form onSubmit={handleSubmit} style={{ 
+            <form style={{ 
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -65,20 +67,20 @@ function FoodForm() {
                 <TextField
                     id="food"
                     label="Food"
-                    value={food}
+                    value={searchTerm}
                     onChange={handleChange}
                     variant="outlined"
                     size='small'
                 />
-                <Button
+                <Button onClick={handleSearch}
                     variant="contained"
                     color="primary"
                     type="submit"
                     size='large'
                     style={{ marginLeft: '10px' }}
-                    disabled={loading}
+                    disabled={isLoading}
                 >
-                    {loading ? <CircularProgress size={24} /> : 'Fetch Food'}
+                    {isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
             </form>
             
@@ -87,7 +89,7 @@ function FoodForm() {
             </Typography>
 
             <Grid container rowSpacing={{ xs:3, md:4 }}>
-                {loading ? (
+                {isLoading ? (
                     // Display multiple skeleton cards while loading
                     Array.from(new Array(numSkeletons)).map((_, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index} style={{ 
@@ -102,7 +104,7 @@ function FoodForm() {
                     ))
                 ) : (
                 // Display the actual cards when not loading
-                response.map((item, index) => (
+                response && response.map((item, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
                     display: 'flex', 
                     justifyContent: 'center', 
