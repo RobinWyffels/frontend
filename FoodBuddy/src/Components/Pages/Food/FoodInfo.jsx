@@ -10,7 +10,8 @@ import Skeleton from '@mui/material/Skeleton';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useSWR from 'swr';
-import searchFood from '../../../api/foodApi';
+import { searchFood } from '../../../api/foodApi';
+import NoFoodFound from './NoFoodFound';
 
 const theme = createTheme();
 
@@ -19,7 +20,9 @@ const fetcher = (ingr) => searchFood(ingr);
 function FoodForm() {
     const [food, setFood] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: response } = useSWR(food, fetcher);
+    const { data: response, error} = useSWR(food, fetcher);
+    //log
+    console.log("response ", response);
     const [isLoading, setIsLoading] = useState(false);
 
     const matchesSmall = useMediaQuery(theme.breakpoints.down('sm'));
@@ -33,13 +36,14 @@ function FoodForm() {
     const handleSearch = () => {
         setFood(searchTerm);
         setIsLoading(true);
+        
     };
 
     useEffect(() => {
-        if (response) {
+        if (response || error) {
             setIsLoading(false);
         }
-    }, [response]);
+    }, [response, error]);
 
     let numSkeletons;
     if (matchesLarge) {
@@ -88,7 +92,8 @@ function FoodForm() {
                 Response:
             </Typography>
 
-            <Grid container rowSpacing={{ xs:3, md:4 }}>
+            {error ? <NoFoodFound /> : (
+                <Grid container rowSpacing={{ xs:3, md:4 }}>
                 {isLoading ? (
                     // Display multiple skeleton cards while loading
                     Array.from(new Array(numSkeletons)).map((_, index) => (
@@ -113,12 +118,18 @@ function FoodForm() {
                     <FoodCard 
                         label={item.food.label} 
                         image={item.food.image} 
+                        id={item.food.foodId}
+                        measureURI={item.measures[0].uri}
                         nutrients={item.food.nutrients}
                     />
                     </Grid>
                 ))
                 )}
             </Grid>
+            )}
+
+            
+
         </Box>
       );
     
