@@ -2,33 +2,58 @@ import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import FoodCard from './FoodCard';
+import CardList from './CardList';
 import CircularProgress from '@mui/material/CircularProgress';
-import { fetchNextData } from '../../../api/foodApi';
 import Loader from './SkeletonsLoader';
+import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
-import { searchFood } from '../../../api/foodApi';
+import { searchFood, fetchNextData} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
-// implement pagination instead of the load more button
-// for this make the logic so a page gets a number. and each number gets linked to the url to fetch the data for that page.
-// store this and load the cards according to the page number and api link for that page number.
-
 const fetcher = (ingr) => searchFood(ingr);
+
+//TODO pagination is not working
 
 function FoodForm() {
     //Variables
     const [food, setFood] = useState(null);
-    const [nextData, setNextData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [nextPageData, setNextPageData] = useState(null);
+    const [response, setResponse] = useState([]);
 
-    //API call
-    const { data: response, error} = useSWR(food, fetcher);
+    //API call for search
+    const { data: searchResponse, error: searchError } = useSWR(food, fetcher);
+
+    //API call for pagination
+    const { data: pageResponse, error: pageError } = useSWR(`page${page}`, () => fetchNextData(), {
+        onSuccess: (data) => {
+            localStorage.setItem(`page${page}`, JSON.stringify(data));
+            setIsLoading(false);
+        },
+        onError: () => setIsLoading(false),
+        });
+
+    const handleSetPage = async (value) => {
+        // Check if the data for the next page is already in localStorage
+        const storedData = localStorage.getItem(`page${value}`);
+        if (storedData) {
+          // If it is, load it from localStorage
+          setNextPageData(JSON.parse(storedData));
+        } else {
+          // If it's not, fetch the next data and store it in localStorage
+          const data = await fetchNextData(value);
+          localStorage.setItem(`page${value}`, JSON.stringify(data));
+          setNextPageData(data);
+        }
     
-    //handle functions
+        // Update the page count
+        setPage(value);
+        };
+
+// #region Handlers for searchterm input
     const handleChange = (event) => {
         setSearchTerm(event.target.value);
       };
@@ -38,17 +63,20 @@ function FoodForm() {
         setIsLoading(true);
         
     };
+// #endregion
 
-    const handleFetchNextData = async () => {
-        const newData = await fetchNextData();
-        setNextData(newData);
-      };
 
     useEffect(() => {
-        if (response || error) {
+        if (searchResponse || searchError || pageResponse || pageError) {
             setIsLoading(false);
         }
-    }, [response, error]);
+    }, [searchResponse, searchError, pageResponse, pageError]);
+
+    useEffect(() => {
+        if (searchResponse) {
+          setResponse(searchResponse);
+        }
+      }, [searchResponse]);
 
     return (
         <Box style={{ 
@@ -88,58 +116,28 @@ function FoodForm() {
                 Response:
             </Typography>
 
-            {error ? <NoFoodFound /> : (
-                <Box>
-                    <Grid container rowSpacing={{ xs:3, md:4 }}>
-                    {isLoading ?  <Loader/> : (
-                        response && response.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center' 
+            {searchError || pageError ? <NoFoodFound /> : (
+                <Box style={{ marginTop: '1%' }}>
+                    {isLoading ?  <Loader/> : 
+                    <Box style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         }}>
-                        <FoodCard 
-                            label={item.food.label} 
-                            image={item.food.image} 
-                            id={item.food.foodId}
-                            measureURI={item.measures[0].uri}
-                            nutrients={item.food.nutrients}
-                        />
-                        </Grid>
-                    )))}
-                    </Grid>
+                        {/* currently bypassing pagination completely, searchresponse had to be response */}
+                        <CardList response={searchResponse} />
+                        <Pagination style={{
+                            marginBlock: '3%',
+                            }}
+                            count={page}
+                            color="primary"
+                            hidden={response.length === 0}
+                            onChange={(value) => handleSetPage(value)} />
+                    </Box>
+                    
+                    }
 
-                    {response && response.length > 0 && (
-                    <Button onClick={handleFetchNextData}
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    size='large'
-                    disabled={isLoading}
-                    >
-                    Load More
-                    </Button>
-                    )}
-
-                    {nextData.length > 0 && (
-                    <Grid container rowSpacing={{ xs:3, md:4 }}>
-                        {nextData.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center' 
-                        }}>
-                        <FoodCard 
-                            label={item.food.label} 
-                            image={item.food.image} 
-                            id={item.food.foodId}
-                            measureURI={item.measures[0].uri}
-                            nutrients={item.food.nutrients}
-                        />
-                        </Grid>
-                        ))}
-                    </Grid>
-                    )}
                 </Box>
             )}
 
