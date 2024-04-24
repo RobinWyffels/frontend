@@ -16,7 +16,7 @@ import logo1 from '../assets/Logo/FoodBuddyLogo_White-01.png';
 import logo2 from '../assets/Logo/FoodBuddyLogo_White-02.png';
 import { Link } from 'react-router-dom';
 
-const pages = ['home', 'login', 'about'];
+const pages = ['home','foodInfo', 'about'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 
