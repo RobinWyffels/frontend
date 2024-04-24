@@ -6,6 +6,7 @@ import FoodInfo from './Components/Pages/Food/FoodInfo.jsx'
 import NotFound from './Components/Pages/NotFound.jsx';
 import UnderConstruction from './Components/Pages/UnderConstruction.jsx';
 import Layout from './Components/Layout.jsx'
+import FoodDetails from './Components/Pages/Food/FoodDetails.jsx';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -28,6 +29,11 @@ const router = createBrowserRouter([
       {
         path: "/foodinfo",
         element: <FoodInfo />,
+      },
+      {
+        path: "/foodNutrients/:id",
+        element: <FoodDetails />,
+      
       },
       {
         path: "*",

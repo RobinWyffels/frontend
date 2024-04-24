@@ -6,29 +6,29 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FoodCard from './FoodCard';
 import CircularProgress from '@mui/material/CircularProgress';
-import Skeleton from '@mui/material/Skeleton';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { fetchNextData } from '../../../api/foodApi';
+import Loader from './SkeletonsLoader';
 import useSWR from 'swr';
 import { searchFood } from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
-const theme = createTheme();
+// implement pagination instead of the load more button
+// for this make the logic so a page gets a number. and each number gets linked to the url to fetch the data for that page.
+// store this and load the cards according to the page number and api link for that page number.
 
 const fetcher = (ingr) => searchFood(ingr);
 
 function FoodForm() {
+    //Variables
     const [food, setFood] = useState(null);
+    const [nextData, setNextData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: response, error} = useSWR(food, fetcher);
-    //log
-    console.log("response ", response);
     const [isLoading, setIsLoading] = useState(false);
 
-    const matchesSmall = useMediaQuery(theme.breakpoints.down('sm'));
-    const matchesMedium = useMediaQuery(theme.breakpoints.between('md', 'lg'));
-    const matchesLarge = useMediaQuery(theme.breakpoints.up('lg'));
-
+    //API call
+    const { data: response, error} = useSWR(food, fetcher);
+    
+    //handle functions
     const handleChange = (event) => {
         setSearchTerm(event.target.value);
       };
@@ -39,20 +39,16 @@ function FoodForm() {
         
     };
 
+    const handleFetchNextData = async () => {
+        const newData = await fetchNextData();
+        setNextData(newData);
+      };
+
     useEffect(() => {
         if (response || error) {
             setIsLoading(false);
         }
     }, [response, error]);
-
-    let numSkeletons;
-    if (matchesLarge) {
-        numSkeletons = 18;
-    } else if (matchesMedium) {
-        numSkeletons = 12;
-    } else if (matchesSmall) {
-        numSkeletons = 5;
-    }
 
     return (
         <Box style={{ 
@@ -93,52 +89,66 @@ function FoodForm() {
             </Typography>
 
             {error ? <NoFoodFound /> : (
-                <Grid container rowSpacing={{ xs:3, md:4 }}>
-                {isLoading ? (
-                    // Display multiple skeleton cards while loading
-                    Array.from(new Array(numSkeletons)).map((_, index) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index} style={{ 
+                <Box>
+                    <Grid container rowSpacing={{ xs:3, md:4 }}>
+                    {isLoading ?  <Loader/> : (
+                        response && response.map((item, index) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
                         display: 'flex', 
-                        flexDirection: 'column',
                         justifyContent: 'center', 
                         alignItems: 'center' 
-                    }}>
-                        <Skeleton variant="text" animation="wave" width={250} height={80} />
-                        <Skeleton variant="rounded" animation="wave" width={250} height={115} />
+                        }}>
+                        <FoodCard 
+                            label={item.food.label} 
+                            image={item.food.image} 
+                            id={item.food.foodId}
+                            measureURI={item.measures[0].uri}
+                            nutrients={item.food.nutrients}
+                        />
+                        </Grid>
+                    )))}
                     </Grid>
-                    ))
-                ) : (
-                // Display the actual cards when not loading
-                response && response.map((item, index) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center' 
-                    }}>
-                    <FoodCard 
-                        label={item.food.label} 
-                        image={item.food.image} 
-                        id={item.food.foodId}
-                        measureURI={item.measures[0].uri}
-                        nutrients={item.food.nutrients}
-                    />
+
+                    {response && response.length > 0 && (
+                    <Button onClick={handleFetchNextData}
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    size='large'
+                    disabled={isLoading}
+                    >
+                    Load More
+                    </Button>
+                    )}
+
+                    {nextData.length > 0 && (
+                    <Grid container rowSpacing={{ xs:3, md:4 }}>
+                        {nextData.map((item, index) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center' 
+                        }}>
+                        <FoodCard 
+                            label={item.food.label} 
+                            image={item.food.image} 
+                            id={item.food.foodId}
+                            measureURI={item.measures[0].uri}
+                            nutrients={item.food.nutrients}
+                        />
+                        </Grid>
+                        ))}
                     </Grid>
-                ))
-                )}
-            </Grid>
+                    )}
+                </Box>
             )}
 
-            
+
+
 
         </Box>
       );
     
 }
 
-export default function App() {
-    return (
-      <ThemeProvider theme={theme}>
-        <FoodForm />
-      </ThemeProvider>
-    );
-  }
+export default FoodForm;

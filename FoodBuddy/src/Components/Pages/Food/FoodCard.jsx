@@ -3,13 +3,23 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
-function FoodCard({ label, nutrients }) { 
+function FoodCard({ label, id, measureURI, nutrients }) { 
   const { ENERC_KCAL, PROCNT, FAT, CHOCDF, FIBTG } = nutrients;
-    
+
+    const handleCardClick = () => {
+      localStorage.setItem('measureURI', measureURI);
+    };
+
+
     return (
         <Card sx={{ width: '250px', height: '200px'}}>
-            <CardActionArea sx={{ width: '250px', height: '200px'}}>
+            <CardActionArea sx={{ width: '250px', height: '200px'}} 
+            component={Link}
+            to={`/foodNutrients/${id}`}
+            onClick={handleCardClick}
+            >
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
                   {label}
@@ -38,6 +48,8 @@ function FoodCard({ label, nutrients }) {
 FoodCard.propTypes = {
   label: PropTypes.string,
   image: PropTypes.string,
+  id: PropTypes.string,
+  measureURI: PropTypes.string,
   nutrients: PropTypes.shape({
     ENERC_KCAL: PropTypes.number,
     PROCNT: PropTypes.number,
