@@ -24,9 +24,9 @@ export default function Skeletons() {
   }, [matchesSmall, matchesMedium, matchesLarge, numSkeletons]);
 
   return (
-    <Grid container rowSpacing={{ xs:3, md:4 }} >
+    <Grid container rowSpacing={{ xs:3, md:4 }} sx={{ paddingInline: { xs: '0%', sm: '5%', lg: '10%', xl: '15%' }}}>
         {Array.from(new Array(numSkeletons)).map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index} style={{ 
+            <Grid item xs={12} sm={6} md={4} xl={3} key={index} style={{ 
                 display: 'flex', 
                 flexDirection: 'column',
                 justifyContent: 'center', 

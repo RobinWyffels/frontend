@@ -17,11 +17,10 @@ function FoodForm(){
     //Searchvariables
     const [food, setFood] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    // const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     //pagination variables
     const [numberOfPages, setNumberOfPages] = useState(2);
-    // const [disableArrows, setDisableArrows] = useState(false);
     const [page, setPage] = useState(1); //current page
 
     //api call
@@ -39,7 +38,6 @@ function FoodForm(){
 
     const handleSearch = () => {
         setFood(searchTerm)
-        // setIsLoading(true);
     }
 
     const handlePageChange = (event, value) => {
@@ -50,7 +48,7 @@ function FoodForm(){
 
     // useEffects
     //#region
-    //loadsetter
+    //first page
     useEffect(() => {
         const checkLastPage = async () => {
             const isEnd = isLastPage();
@@ -62,7 +60,6 @@ function FoodForm(){
         }
         
         if(response){
-            // setIsLoading(false);
             setResponseDictionary(prevMap => {
                 prevMap.clear();
                 return new Map(prevMap.set(1, response));
@@ -74,19 +71,18 @@ function FoodForm(){
 
     useEffect(() => {
         if(page == numberOfPages){
-            // setIsLoading(true);
-            //fetch next page and add to response array
+            setIsLoading(true);
            const fetchData = async () => {
                 try {
                     const {hints: nextPageData, LastPage} = await fetchNextData();
                     setResponseDictionary(prevMap => new Map(prevMap.set(page, nextPageData)));
                     
-                    // setIsLoading(false);
+                    setIsLoading(false);
                     if(!LastPage){
                         setNumberOfPages(numberOfPages + 1);
                     }
                 }catch(error){
-                    return(null);//TODO: handle error
+                    return error;
                 }
             }
             fetchData();
@@ -94,11 +90,6 @@ function FoodForm(){
         }
     },[page, numberOfPages])
     //#endregion
-    //debug useEffect for logging
-
-    useEffect(() => {
-        console.log('data:', responseDictionary);
-    }, [responseDictionary]);
 
     return (
         <Box style={{ 
@@ -133,9 +124,9 @@ function FoodForm(){
                     type="submit"
                     size='large'
                     style={{ marginLeft: '10px' }}
-                    disabled={isValidating}
+                    disabled={isValidating || isLoading}
                 >
-                    {isValidating ? <CircularProgress size={24} /> : 'Fetch Food'}
+                    {isValidating || isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
             </form>
 
@@ -145,7 +136,7 @@ function FoodForm(){
 
             {error ? <NoFoodFound /> : (
                 <Box style={{ marginTop: '1%' }}>
-                    {isValidating ?  <Loader/> : 
+                    {isValidating || isLoading ?  <Loader/> : 
                     <Box style={{ 
                         display: 'flex',
                         flexDirection: 'column',
@@ -155,7 +146,6 @@ function FoodForm(){
                         {response && <>
                             <CardList response={responseDictionary.get(page)} />
                             <Pagination count={numberOfPages} style={{marginBlock: '3%'}} size="large" page={page} onChange={ handlePageChange} />
-                            {/* add to pagination that arrows get disabled when boolean DisableArrows == true*/}
                         </>}
                         
                     </Box>
