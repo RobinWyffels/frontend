@@ -6,77 +6,44 @@ import Typography from '@mui/material/Typography';
 import CardList from './CardList';
 import CircularProgress from '@mui/material/CircularProgress';
 import Loader from './SkeletonsLoader';
-import Pagination from '@mui/material/Pagination';
+// import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
-import { searchFood, fetchNextData} from '../../../api/foodApi';
+import { searchFood} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
-const fetcher = (ingr) => searchFood(ingr);
+function FoodForm(){
 
-//TODO pagination is not working
-
-function FoodForm() {
-    //Variables
+    //variables
     const [food, setFood] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [nextPageData, setNextPageData] = useState(null);
-    const [response, setResponse] = useState([]);
 
-    //API call for search
-    const { data: searchResponse, error: searchError } = useSWR(food, fetcher);
+    //api call
+    const { data: response, error: error } = useSWR(food, searchFood);
 
-    //API call for pagination
-    const { data: pageResponse, error: pageError } = useSWR(`page${page}`, () => fetchNextData(), {
-        onSuccess: (data) => {
-            localStorage.setItem(`page${page}`, JSON.stringify(data));
-            setIsLoading(false);
-        },
-        onError: () => setIsLoading(false),
-        });
-
-    const handleSetPage = async (value) => {
-        // Check if the data for the next page is already in localStorage
-        const storedData = localStorage.getItem(`page${value}`);
-        if (storedData) {
-          // If it is, load it from localStorage
-          setNextPageData(JSON.parse(storedData));
-        } else {
-          // If it's not, fetch the next data and store it in localStorage
-          const data = await fetchNextData(value);
-          localStorage.setItem(`page${value}`, JSON.stringify(data));
-          setNextPageData(data);
-        }
-    
-        // Update the page count
-        setPage(value);
-        };
-
-// #region Handlers for searchterm input
-    const handleChange = (event) => {
+    //handlers 
+    //#region
+    const handleInputChange = (event) => {
         setSearchTerm(event.target.value);
-      };
+    }
 
     const handleSearch = () => {
-        setFood(searchTerm);
+        setFood(searchTerm)
         setIsLoading(true);
-        
-    };
-// #endregion
+    }
+    // #endregion
 
-
+    // react hooks
+    //#region
+    //loadsetter
     useEffect(() => {
-        if (searchResponse || searchError || pageResponse || pageError) {
+        if(response){
             setIsLoading(false);
         }
-    }, [searchResponse, searchError, pageResponse, pageError]);
+    }, [response])
 
-    useEffect(() => {
-        if (searchResponse) {
-          setResponse(searchResponse);
-        }
-      }, [searchResponse]);
+
+    //#endregion
 
     return (
         <Box style={{ 
@@ -85,6 +52,10 @@ function FoodForm() {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
+            <Typography variant="h4">
+                Search for any food item, brand or product
+            </Typography>
+
             <form style={{ 
                 display: 'flex',
                 justifyContent: 'center',
@@ -96,7 +67,7 @@ function FoodForm() {
                     id="food"
                     label="Food"
                     value={searchTerm}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     variant="outlined"
                     size='small'
                 />
@@ -111,12 +82,12 @@ function FoodForm() {
                     {isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
             </form>
-            
+
             <Typography variant="h4">
                 Response:
             </Typography>
 
-            {searchError || pageError ? <NoFoodFound /> : (
+            {error ? <NoFoodFound /> : (
                 <Box style={{ marginTop: '1%' }}>
                     {isLoading ?  <Loader/> : 
                     <Box style={{ 
@@ -125,28 +96,14 @@ function FoodForm() {
                         justifyContent: 'center',
                         alignItems: 'center',
                         }}>
-                        {/* currently bypassing pagination completely, searchresponse had to be response */}
-                        <CardList response={searchResponse} />
-                        <Pagination style={{
-                            marginBlock: '3%',
-                            }}
-                            count={page}
-                            color="primary"
-                            hidden={response.length === 0}
-                            onChange={(value) => handleSetPage(value)} />
+                        {response && <CardList response={response} />}
+                        
                     </Box>
-                    
                     }
-
                 </Box>
             )}
-
-
-
-
         </Box>
-      );
-    
+    );
 }
 
 export default FoodForm;

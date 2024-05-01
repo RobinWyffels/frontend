@@ -13,7 +13,7 @@ export default function Skeletons() {
   const [numSkeletons, setNumSkeletons] = useState(initialSkeletons);
 
   useEffect(() => {
-    console.log(`Small: ${matchesSmall}, Medium: ${matchesMedium}, Large: ${matchesLarge}`);
+    // console.log(`Small: ${matchesSmall}, Medium: ${matchesMedium}, Large: ${matchesLarge}`);
     if (matchesLarge && numSkeletons !== 18) {
       setNumSkeletons(18);
     } else if (matchesMedium && numSkeletons !== 12) {
