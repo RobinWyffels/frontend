@@ -21,8 +21,13 @@ export const searchFood = async (ingr) => {
 
     // Get the next link for pagination
     nextLink = response.data._links?.next?.href;
-
     return response.data.hints;
+    // const LastPage = nextLink ? false : true;
+
+    // return {
+    //   hints: response.data.hints,
+    //   LastPage: LastPage
+    // };
   } catch (error) {
     console.error('Error searching food database:', error);
     throw error;
@@ -37,12 +42,18 @@ export const fetchNextData = async () => {
 
   try {
     const response = await axios.get(nextLink);
-    console.log("raw response", response.data);
+    //console.log("raw response", response.data);
 
     // Update the next link with the new link if available
     nextLink = response.data._links?.next?.href;
 
-    return response.data.hints;
+    // Determine if we've reached the end of the pages
+    const LastPage = nextLink ? false : true;
+
+    return {
+      hints: response.data.hints,
+      LastPage: LastPage
+    };
   } catch (error) {
     console.error('Error fetching next page:', error);
     throw error;

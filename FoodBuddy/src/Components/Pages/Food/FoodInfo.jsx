@@ -8,18 +8,28 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Loader from './SkeletonsLoader';
 import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
-import { searchFood} from '../../../api/foodApi';
+import { searchFood, fetchNextData} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
 function FoodForm(){
-
     //variables
+    //#region 
+    //Searchvariables
     const [food, setFood] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
+
+    //pagination variables
+    const [numberOfPages, setNumberOfPages] = useState(2);
+    // const [disableArrows, setDisableArrows] = useState(false);
+    const [page, setPage] = useState(1); //current page
 
     //api call
-    const { data: response, error: error } = useSWR(food, searchFood);
+    const {data: response, error: error, isValidating} = useSWR(food, searchFood);
+
+    //responseDictionary
+    const [responseDictionary, setResponseDictionary] = useState(new Map());
+    //#endregion
 
     //handlers 
     //#region
@@ -29,21 +39,60 @@ function FoodForm(){
 
     const handleSearch = () => {
         setFood(searchTerm)
-        setIsLoading(true);
+        // setIsLoading(true);
+    }
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        
     }
     // #endregion
 
-    // react hooks
+    // useEffects
     //#region
     //loadsetter
     useEffect(() => {
         if(response){
-            setIsLoading(false);
+            // setIsLoading(false);
+            setResponseDictionary(prevMap => {
+                prevMap.clear();
+                return new Map(prevMap.set(1, response));
+            });
+            setPage(1);
+            setNumberOfPages(2);
         }
     }, [response])
 
-
+    useEffect(() => {
+        if(page == numberOfPages){
+            // setIsLoading(true);
+            //fetch next page and add to response array
+           const fetchData = async () => {
+                try {
+                    const {hints: nextPageData, LastPage} = await fetchNextData();
+                    setResponseDictionary(prevMap => new Map(prevMap.set(page, nextPageData)));
+                    
+                    // setIsLoading(false);
+                    if(!LastPage){
+                        setNumberOfPages(numberOfPages + 1);
+                    }
+                    // else{
+                    //     setDisableArrows(true);
+                    // }
+                }catch(error){
+                    return(null);//TODO: handle error
+                }
+            }
+            fetchData();
+            
+        }
+    },[page, numberOfPages])
     //#endregion
+    //debug useEffect for logging
+
+    useEffect(() => {
+        console.log('data:', responseDictionary);
+    }, [responseDictionary]);
 
     return (
         <Box style={{ 
@@ -78,9 +127,9 @@ function FoodForm(){
                     type="submit"
                     size='large'
                     style={{ marginLeft: '10px' }}
-                    disabled={isLoading}
+                    disabled={isValidating}
                 >
-                    {isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
+                    {isValidating ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
             </form>
 
@@ -90,17 +139,20 @@ function FoodForm(){
 
             {error ? <NoFoodFound /> : (
                 <Box style={{ marginTop: '1%' }}>
-                    {isLoading ?  <Loader/> : 
+                    {isValidating ?  <Loader/> : 
                     <Box style={{ 
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
                         }}>
-                        {response && <CardList response={response} />}
-                        <Pagination style={{
-                            marginBlock: '3%',
-                            }} />
+                        {response && <>
+                            <CardList response={responseDictionary.get(page)} />
+                            <Typography>Page: {page}</Typography>
+                            <Pagination count={numberOfPages} style={{marginBlock: '3%'}} size="large" page={page} onChange={ handlePageChange} />
+                            {/* add to pagination that arrows get disabled when boolean DisableArrows == true*/}
+                        </>}
+                        
                     </Box>
                     }
                 </Box>
