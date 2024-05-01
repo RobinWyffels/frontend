@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+const api = axios.create();
 
 const FOOD_APP_ID = "45be9297";
 const FOOD_APP_KEY = "c3ca97f64d4e593ddd79f064eb855fba";
@@ -50,31 +51,37 @@ export const fetchNextData = async () => {
 };
 
 // Function to get the nutrients of a food item
-export const getNutrients = async (measureURI, foodId) => {
+export const getNutrients = async (quantity, measureURI, foodId) => {
   try {
-    const response = await axios.post(
-      'https://api.edamam.com/api/food-database/v2/nutrients',
+    quantity = 1000
+    const response = await api.post(
+      `/api/food-database/v2/nutrients?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`,
       {
         "ingredients": [
           {
-            "quantity": 1,
-            "measureURI": measureURI,
-            "foodId": foodId
+            "quantity": quantity,
+            "measureURI": `${measureURI}`,
+            "foodId": `${foodId}`
           }
         ]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'app_id': FOOD_APP_ID,
-          'app_key': FOOD_APP_KEY
-        }
       }
     );
+
+    console.log('Response headers:', response.headers);
+
+
     return response.data;
   } catch (error) {
     console.error('Error getting nutrients:', error);
     return null;
   }
 };
+
+api.interceptors.request.use((config) => {
+  // Log the headers of the outgoing request
+  console.log('Request body:', config.data);
+
+  // Important: return the config or the request will be blocked
+  return config;
+});
 
