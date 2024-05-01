@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CardList from './CardList';
 import CircularProgress from '@mui/material/CircularProgress';
 import Loader from './SkeletonsLoader';
-// import Pagination from '@mui/material/Pagination';
+import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
 import { searchFood} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
@@ -56,7 +56,8 @@ function FoodForm(){
                 Search for any food item, brand or product
             </Typography>
 
-            <form style={{ 
+            <form  
+                style={{ 
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -97,7 +98,9 @@ function FoodForm(){
                         alignItems: 'center',
                         }}>
                         {response && <CardList response={response} />}
-                        
+                        <Pagination style={{
+                            marginBlock: '3%',
+                            }} />
                     </Box>
                     }
                 </Box>
