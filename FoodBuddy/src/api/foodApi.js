@@ -21,17 +21,17 @@ export const searchFood = async (ingr) => {
 
     // Get the next link for pagination
     nextLink = response.data._links?.next?.href;
+    
     return response.data.hints;
-    // const LastPage = nextLink ? false : true;
-
-    // return {
-    //   hints: response.data.hints,
-    //   LastPage: LastPage
-    // };
+    
   } catch (error) {
     console.error('Error searching food database:', error);
     throw error;
   }
+};
+
+export const isLastPage = () => {
+  return nextLink ? false : true;
 };
 
 // Function to fetch the next page of data

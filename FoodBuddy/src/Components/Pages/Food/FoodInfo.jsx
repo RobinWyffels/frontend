@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Loader from './SkeletonsLoader';
 import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
-import { searchFood, fetchNextData} from '../../../api/foodApi';
+import { searchFood, fetchNextData, isLastPage} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
 function FoodForm(){
@@ -52,6 +52,15 @@ function FoodForm(){
     //#region
     //loadsetter
     useEffect(() => {
+        const checkLastPage = async () => {
+            const isEnd = isLastPage();
+            if (isEnd) {
+                setNumberOfPages(1);
+            }else{
+                setNumberOfPages(2);
+            }
+        }
+        
         if(response){
             // setIsLoading(false);
             setResponseDictionary(prevMap => {
@@ -59,7 +68,7 @@ function FoodForm(){
                 return new Map(prevMap.set(1, response));
             });
             setPage(1);
-            setNumberOfPages(2);
+            checkLastPage();
         }
     }, [response])
 
@@ -76,9 +85,6 @@ function FoodForm(){
                     if(!LastPage){
                         setNumberOfPages(numberOfPages + 1);
                     }
-                    // else{
-                    //     setDisableArrows(true);
-                    // }
                 }catch(error){
                     return(null);//TODO: handle error
                 }
@@ -148,7 +154,6 @@ function FoodForm(){
                         }}>
                         {response && <>
                             <CardList response={responseDictionary.get(page)} />
-                            <Typography>Page: {page}</Typography>
                             <Pagination count={numberOfPages} style={{marginBlock: '3%'}} size="large" page={page} onChange={ handlePageChange} />
                             {/* add to pagination that arrows get disabled when boolean DisableArrows == true*/}
                         </>}
