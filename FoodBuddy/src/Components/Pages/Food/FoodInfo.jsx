@@ -70,7 +70,7 @@ function FoodForm(){
     }, [response])
 
     useEffect(() => {
-        if(page == numberOfPages){
+        if(page == numberOfPages && page != 1){
             setIsLoading(true);
            const fetchData = async () => {
                 try {
