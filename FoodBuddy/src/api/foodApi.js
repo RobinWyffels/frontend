@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: 'https://api.edamam.com/api/food-database/v2/',
+});
 
 const FOOD_APP_ID = "45be9297";
 const FOOD_APP_KEY = "c3ca97f64d4e593ddd79f064eb855fba";
@@ -10,8 +13,8 @@ let nextLink = null;
 // Function to search food in the food database
 export const searchFood = async (ingr) => {
   try {
-    const response = await axios.get(
-      `https://api.edamam.com/api/food-database/v2/parser?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}&ingr=${ingr}&nutrition-type=cooking`
+    const response = await api.get(
+      `parser?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}&ingr=${ingr}&nutrition-type=cooking`
     );
     console.log("raw response", response.data);
 
@@ -41,8 +44,10 @@ export const fetchNextData = async () => {
   }
 
   try {
-    const response = await axios.get(nextLink);
-    //console.log("raw response", response.data);
+
+    const response = await api.get(nextLink);
+    console.log("raw response", response.data);
+
 
     // Update the next link with the new link if available
     nextLink = response.data._links?.next?.href;
@@ -61,31 +66,36 @@ export const fetchNextData = async () => {
 };
 
 // Function to get the nutrients of a food item
-export const getNutrients = async (measureURI, foodId) => {
+export const getNutrients = async (foodId, measureURI) => {
   try {
-    const response = await axios.post(
-      'https://api.edamam.com/api/food-database/v2/nutrients',
+    const response = await api.post(
+      `nutrients?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`,
       {
         "ingredients": [
           {
             "quantity": 1,
-            "measureURI": measureURI,
-            "foodId": foodId
+            "measureURI": `${measureURI}`,
+            "foodId": `${foodId}`
           }
         ]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'app_id': FOOD_APP_ID,
-          'app_key': FOOD_APP_KEY
-        }
       }
     );
+
+    console.log('Response headers:', response.headers);
+
+
     return response.data;
   } catch (error) {
     console.error('Error getting nutrients:', error);
     return null;
   }
 };
+
+api.interceptors.request.use((config) => {
+  // Log the headers of the outgoing request
+  console.log('Request body:', config.data);
+
+  // Important: return the config or the request will be blocked
+  return config;
+});
 
