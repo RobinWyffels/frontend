@@ -33,7 +33,7 @@ const router = createBrowserRouter([
       {
         path: "/foodNutrients/:id",
         element: <FoodDetails />,
-      
+        
       },
       {
         path: "*",

@@ -13,7 +13,12 @@ function FoodDetails() {
   console.log('Food ID:', id);
   console.log('Measure URI:', URI);
 
- const { data, error } = useSWR([id, URI], getNutrients, {
+  // object doorgeven dat de 2 parameters bevat
+  // unpack de 2 parameters in de api functie
+  // measureURI hardcoden en in dropdown opties geven 
+  // quantity doorgeven en optie geven aan user voor aan te passen
+
+ const { data, error } = useSWR([id, 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving'], getNutrients, {
     onSuccess: () => {
       localStorage.removeItem('measureURI');
     }

@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const api = axios.create();
+const api = axios.create({
+  baseURL: 'https://api.edamam.com/api/food-database/v2/',
+});
 
 const FOOD_APP_ID = "45be9297";
 const FOOD_APP_KEY = "c3ca97f64d4e593ddd79f064eb855fba";
@@ -11,8 +13,8 @@ let nextLink = null;
 // Function to search food in the food database
 export const searchFood = async (ingr) => {
   try {
-    const response = await axios.get(
-      `https://api.edamam.com/api/food-database/v2/parser?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}&ingr=${ingr}&nutrition-type=cooking`
+    const response = await api.get(
+      `parser?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}&ingr=${ingr}&nutrition-type=cooking`
     );
     console.log("raw response", response.data);
 
@@ -37,7 +39,7 @@ export const fetchNextData = async () => {
   }
 
   try {
-    const response = await axios.get(nextLink);
+    const response = await api.get(nextLink);
     console.log("raw response", response.data);
 
     // Update the next link with the new link if available
@@ -51,15 +53,14 @@ export const fetchNextData = async () => {
 };
 
 // Function to get the nutrients of a food item
-export const getNutrients = async (quantity, measureURI, foodId) => {
+export const getNutrients = async (foodId, measureURI) => {
   try {
-    quantity = 1000
     const response = await api.post(
-      `/api/food-database/v2/nutrients?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`,
+      `nutrients?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`,
       {
         "ingredients": [
           {
-            "quantity": quantity,
+            "quantity": 1,
             "measureURI": `${measureURI}`,
             "foodId": `${foodId}`
           }
