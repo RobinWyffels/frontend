@@ -2,53 +2,94 @@ import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import FoodCard from './FoodCard';
+import CardList from './CardList';
 import CircularProgress from '@mui/material/CircularProgress';
-import { fetchNextData } from '../../../api/foodApi';
 import Loader from './SkeletonsLoader';
+import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
-import { searchFood } from '../../../api/foodApi';
+import { searchFood, fetchNextData, isLastPage} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
 
-// implement pagination instead of the load more button
-// for this make the logic so a page gets a number. and each number gets linked to the url to fetch the data for that page.
-// store this and load the cards according to the page number and api link for that page number.
-
-const fetcher = (ingr) => searchFood(ingr);
-
-function FoodForm() {
-    //Variables
+function FoodForm(){
+    //variables
+    //#region 
+    //Searchvariables
     const [food, setFood] = useState(null);
-    const [nextData, setNextData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    //API call
-    const { data: response, error} = useSWR(food, fetcher);
-    
-    //handle functions
-    const handleChange = (event) => {
+    //pagination variables
+    const [numberOfPages, setNumberOfPages] = useState(2);
+    const [page, setPage] = useState(1); //current page
+
+    //api call
+    const {data: response, error: error, isValidating} = useSWR(food, searchFood);
+
+    //responseDictionary
+    const [responseDictionary, setResponseDictionary] = useState(new Map());
+    //#endregion
+
+    //handlers 
+    //#region
+    const handleInputChange = (event) => {
         setSearchTerm(event.target.value);
-      };
+    }
 
     const handleSearch = () => {
-        setFood(searchTerm);
-        setIsLoading(true);
-        
-    };
+        setFood(searchTerm)
+    }
 
-    const handleFetchNextData = async () => {
-        const newData = await fetchNextData();
-        setNextData(newData);
-      };
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        
+    }
+    // #endregion
+
+    // useEffects
+    //#region
+    //first page
+    useEffect(() => {
+        const checkLastPage = async () => {
+            const isEnd = isLastPage();
+            if (isEnd) {
+                setNumberOfPages(1);
+            }else{
+                setNumberOfPages(2);
+            }
+        }
+        
+        if(response){
+            setResponseDictionary(prevMap => {
+                prevMap.clear();
+                return new Map(prevMap.set(1, response));
+            });
+            setPage(1);
+            checkLastPage();
+        }
+    }, [response])
 
     useEffect(() => {
-        if (response || error) {
-            setIsLoading(false);
+        if(page == numberOfPages && page != 1){
+            setIsLoading(true);
+           const fetchData = async () => {
+                try {
+                    const {hints: nextPageData, LastPage} = await fetchNextData();
+                    setResponseDictionary(prevMap => new Map(prevMap.set(page, nextPageData)));
+                    
+                    setIsLoading(false);
+                    if(!LastPage){
+                        setNumberOfPages(numberOfPages + 1);
+                    }
+                }catch(error){
+                    return error;
+                }
+            }
+            fetchData();
+            
         }
-    }, [response, error]);
+    },[page, numberOfPages])
+    //#endregion
 
     return (
         <Box style={{ 
@@ -57,7 +98,12 @@ function FoodForm() {
             alignItems: 'center',
             flexDirection: 'column',
         }}>
-            <form style={{ 
+            <Typography variant="h4">
+                Search for any food item, brand or product
+            </Typography>
+
+            <form  
+                style={{ 
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -68,7 +114,7 @@ function FoodForm() {
                     id="food"
                     label="Food"
                     value={searchTerm}
-                    onChange={handleChange}
+                    onChange={handleInputChange}
                     variant="outlined"
                     size='small'
                 />
@@ -78,77 +124,36 @@ function FoodForm() {
                     type="submit"
                     size='large'
                     style={{ marginLeft: '10px' }}
-                    disabled={isLoading}
+                    disabled={isValidating || isLoading}
                 >
-                    {isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
+                    {isValidating || isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
             </form>
-            
+
             <Typography variant="h4">
                 Response:
             </Typography>
 
             {error ? <NoFoodFound /> : (
-                <Box>
-                    <Grid container rowSpacing={{ xs:3, md:4 }}>
-                    {isLoading ?  <Loader/> : (
-                        response && response.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center' 
+                <Box style={{ marginTop: '1%' }}>
+                    {isValidating || isLoading ?  <Loader/> : 
+                    <Box style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         }}>
-                        <FoodCard 
-                            label={item.food.label} 
-                            image={item.food.image} 
-                            id={item.food.foodId}
-                            measureURI={item.measures[0].uri}
-                            nutrients={item.food.nutrients}
-                        />
-                        </Grid>
-                    )))}
-                    </Grid>
-
-                    {response && response.length > 0 && (
-                    <Button onClick={handleFetchNextData}
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    size='large'
-                    disabled={isLoading}
-                    >
-                    Load More
-                    </Button>
-                    )}
-
-                    {nextData.length > 0 && (
-                    <Grid container rowSpacing={{ xs:3, md:4 }}>
-                        {nextData.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={index}  style={{ 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center' 
-                        }}>
-                        <FoodCard 
-                            label={item.food.label} 
-                            image={item.food.image} 
-                            id={item.food.foodId}
-                            measureURI={item.measures[0].uri}
-                            nutrients={item.food.nutrients}
-                        />
-                        </Grid>
-                        ))}
-                    </Grid>
-                    )}
+                        {response && <>
+                            <CardList response={responseDictionary.get(page)} />
+                            <Pagination count={numberOfPages} style={{marginBlock: '3%'}} size="large" page={page} onChange={ handlePageChange} />
+                        </>}
+                        
+                    </Box>
+                    }
                 </Box>
             )}
-
-
-
-
         </Box>
-      );
-    
+    );
 }
 
 export default FoodForm;
