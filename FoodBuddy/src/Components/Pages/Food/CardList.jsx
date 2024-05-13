@@ -20,10 +20,11 @@ function CardList({ response }) {
             }}>
             <FoodCard 
                 label={item.food.label} 
-                image={item.food.image} 
                 id={item.food.foodId}
-                measureURI={item.measures[0].uri}
                 nutrients={item.food.nutrients}
+                image={item.food.image}
+                category={item.food.category}
+                measures={item.measures}
             />
             </Grid>
         ))}

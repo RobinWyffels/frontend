@@ -16,7 +16,7 @@ export const searchFood = async (ingr) => {
     const response = await api.get(
       `parser?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}&ingr=${ingr}&nutrition-type=cooking`
     );
-    console.log("raw response", response.data);
+    // console.log("raw response", response.data);
 
     if (response.data.hints.length === 0) {
       throw new Error('No food found for the given ingredient');
@@ -35,7 +35,7 @@ export const searchFood = async (ingr) => {
 
 export const isLastPage = () => {
   return nextLink ? false : true;
-};
+};  
 
 // Function to fetch the next page of data
 export const fetchNextData = async () => {
@@ -46,7 +46,7 @@ export const fetchNextData = async () => {
   try {
 
     const response = await api.get(nextLink);
-    console.log("raw response", response.data);
+    // console.log("raw response", response.data);
 
 
     // Update the next link with the new link if available
@@ -66,22 +66,24 @@ export const fetchNextData = async () => {
 };
 
 // Function to get the nutrients of a food item
-export const getNutrients = async (foodId, measureURI) => {
+export const getNutrients = async (food) => {
+  // food is a map with the foodId and measureURI and quantity
+  const foodId = food.id;
+  const measureURI = food.uri;
+  const quantity = food.quantity;
   try {
     const response = await api.post(
       `nutrients?app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`,
       {
         "ingredients": [
           {
-            "quantity": 1,
+            "quantity": quantity,
             "measureURI": `${measureURI}`,
             "foodId": `${foodId}`
           }
         ]
       }
     );
-
-    console.log('Response headers:', response.headers);
 
 
     return response.data;
@@ -91,11 +93,11 @@ export const getNutrients = async (foodId, measureURI) => {
   }
 };
 
-api.interceptors.request.use((config) => {
-  // Log the headers of the outgoing request
-  console.log('Request body:', config.data);
+// api.interceptors.request.use((config) => {
+//   // Log the headers of the outgoing request
+//   console.log('Request body:', config.data);
 
-  // Important: return the config or the request will be blocked
-  return config;
-});
+//   // Important: return the config or the request will be blocked
+//   return config;
+// });
 
