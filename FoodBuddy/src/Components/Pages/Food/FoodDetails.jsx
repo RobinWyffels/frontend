@@ -104,13 +104,15 @@ function FoodDetails() {
           item={item}
         />
       </Paper>
-      <Divider aria-hidden="true" sx={{borderWidth: 0}}/>
+
+      <Box sx={{height: 50}}/>
+
       <Paper elevation={3}>
         <NutriTableSpecial
-          data={data}
+          item={item}
         />
       </Paper>
-      <Divider aria-hidden="true" sx={{borderWidth: 0}}/>
+
       <Typography mt={2} variant='h5'>Conversions:</Typography>
       <Conversions/>
     </Box>
