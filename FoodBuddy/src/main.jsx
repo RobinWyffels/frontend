@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Auth0Provider } from "@auth0/auth0-react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Home from './Components/Pages/Home.jsx'
 import FoodInfo from './Components/Pages/Food/FoodInfo.jsx'
@@ -45,10 +46,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/login",
-    element: <Navigate to="/underConstuction" replace/>,
-  },
   
   {
     path: "*",
@@ -58,6 +55,14 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Auth0Provider
+      domain="dev-k2d82dpnk36wm4mx.eu.auth0.com"
+      clientId="utJCPRkAxSzynRkvTotAosG6z4wQ8CvD"
+      authorizationParams={{
+        redirect_uri: window.location.origin
+      }}
+    >
+      <RouterProvider router={router} />
+    </Auth0Provider>
   </React.StrictMode>
 );
