@@ -5,20 +5,27 @@ import { CardActionArea } from '@mui/material';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-function FoodCard({ label, id, measureURI, nutrients }) { 
+function FoodCard({ label, id, nutrients, image, category, measures}) { 
   const { ENERC_KCAL, PROCNT, FAT, CHOCDF, FIBTG } = nutrients;
 
-    const handleCardClick = () => {
-      localStorage.setItem('measureURI', measureURI);
-    };
+  const food = {
+    label: label,
+    id: id,
+    uri: measures,
+    image: image,
+    category: category,
+  }
 
+  const handleClick = () => {
+    localStorage.setItem(`FoodCard${id}`,JSON.stringify(food))
+  }
 
     return (
         <Card sx={{ width: '250px', height: '200px'}}>
             <CardActionArea sx={{ width: '250px', height: '200px'}} 
             component={Link}
             to={`/foodNutrients/${id}`}
-            onClick={handleCardClick}
+            onClick={handleClick}
             >
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
@@ -57,6 +64,8 @@ FoodCard.propTypes = {
     CHOCDF: PropTypes.number,
     FIBTG: PropTypes.number,
   }),
+  category: PropTypes.string,
+  measures: PropTypes.array,
 };
 
 export default FoodCard;
