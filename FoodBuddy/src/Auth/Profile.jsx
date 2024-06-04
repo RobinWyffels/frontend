@@ -1,10 +1,12 @@
-import LoginButton from "../../Auth/Login";
+import { withAuth0 } from "@auth0/auth0-react";
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import backgroundImage from '../../assets/HomepageBackgroundDesktop.png';
+import Logout from "./Logout";
 
 
-function Home() {
+function Profile() {
+    
+
     return (
         <Box sx={{
             display: 'flex',
@@ -14,19 +16,14 @@ function Home() {
             minHeight: '100vh',
             // width: '100vw',
             textAlign: 'center',
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'Cover',
-            backgroundPosition: 'center',
         
         }}>
             <Typography variant="h1" color="initial">Welcome to FoodBuddy!</Typography>
             <Typography variant="h4" color="initial">Feast on Facts</Typography>
             <Typography mt={2} mb={2} variant="body1" color="initial">try our food info and meny more features now for free!</Typography>
-            <LoginButton />
-            
+            <Logout></Logout>
         </Box>
     );
 }
 
-export default Home;
+export default Profile;

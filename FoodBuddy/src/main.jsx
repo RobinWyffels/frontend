@@ -8,6 +8,8 @@ import NotFound from './Components/Pages/NotFound.jsx';
 import UnderConstruction from './Components/Pages/UnderConstruction.jsx';
 import Layout from './Components/Layout.jsx'
 import FoodDetails from './Components/Pages/Food/FoodDetails.jsx';
+import PrivateRoute from './Components/PrivateRoute.jsx';
+import Profile from './Auth/Profile.jsx';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -15,6 +17,7 @@ import '@fontsource/roboto/700.css';
 
 
 const router = createBrowserRouter([
+
   {
     element: <Layout />,
     children: [
@@ -28,13 +31,27 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
         path: "/foodinfo",
-        element: <FoodInfo />,
+        element: <PrivateRoute />,
+        children: [
+          {
+            element: <FoodInfo />,
+          },
+        ],
       },
       {
         path: "/foodNutrients/:id",
         element: <FoodDetails />,
         
+      },
+      
+      {
+        path: "/about",
+        element: <UnderConstruction />,
       },
       {
         path: "*",
