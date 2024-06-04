@@ -1,31 +1,27 @@
-import { Outlet } from 'react-router-dom';
-import { useAuth0 } from "@auth0/auth0-react";
+import PropTypes from 'prop-types';
 
-export default function PrivateRoute() {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+import { useAuth0 } from '@auth0/auth0-react';
+import { Route, Navigate } from 'react-router-dom';
 
-  console.log("PrivateRoute isAuthen:", isAuthenticated)
+const PrivateRoute = ({ children, ...rest }) => {
+  const { isAuthenticated, isLoading } = useAuth0();
 
   if (isLoading) {
-    return (
-      <div className='container'>
-        <div className='row'>
-          <div className='col-12'>
-            <h1>Loading...</h1>
-            <p>
-              Please wait while we are checking your credentials and loading the
-              application.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
-  if (isAuthenticated) {
-    return <Outlet />;
-  }
+  return isAuthenticated ? (
+    <Route {...rest}>{children}</Route>
+  ) : (
+    <Navigate to="/login" />
+  );
+};
 
-  loginWithRedirect();
-  return null;
-}
+PrivateRoute.propTypes = {
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      PropTypes.node
+    ]).isRequired,
+  };
+
+export default PrivateRoute;

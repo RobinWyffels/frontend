@@ -45,7 +45,7 @@ function FoodDetails() {
   // console.log(healthLabels);
   //#endregion
   return (
-    <Box sx={{marginInline: '5%',}}>
+    <Box sx={{marginInline: '5%', marginTop: '110px'}}>
       <Box
         sx={{
           display:'flex', 
@@ -99,7 +99,7 @@ function FoodDetails() {
         />
       </Paper>
 
-      <Typography mt={2} variant='h5'>Conversions:</Typography>
+      {/* <Typography mt={2} variant='h5'>Conversions:</Typography> */}
       {/* <Conversions/> */}
     </Box>
   );
