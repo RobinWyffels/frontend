@@ -1,15 +1,12 @@
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { getNutrients } from '../../../api/foodApi';
-// import { useState } from 'react';
 import NutriTable from './NutriTable';
 import NutriTableSpecial from './NutriTableSpecial';
-import Conversions from './Conversions';
+// import Conversions from './Conversions';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
-// import TextField from '@mui/material/TextField';
-// import Autocomplete from '@mui/material/Autocomplete';
 import Typography from '@mui/material/Typography';
 
 
@@ -22,17 +19,6 @@ function FoodDetails() {
   const food = {
     id: item.id,
   };
-  // const [uriOptions, setUriOptions] = useState(localStorage.getItem(id).measures);
-  
-  
- 
-  // get uri options from foodcard, every food has different uri's
-  // pass mesures as object trough to foodDetails, unpack and put into map called "uriDict" lable as key, and uri as value eg.(Serving: 'http://www.edamam.com/ontologies/edamam.owl#Measure_serving').
-  // populate other const "uriOptions" with lables of all uri's use uriOptions as options in autocomplete 
-  // use uriDict.get(selection from uriOption) to setUri --> setURI(uriDict.get(selection from uriOption))
-
-  //get image from foodcard
-  //input type number for quantity
 
   const { data } = useSWR(food, getNutrients);
 
@@ -59,7 +45,7 @@ function FoodDetails() {
   // console.log(healthLabels);
   //#endregion
   return (
-    <Box sx={{marginInline: '5%',}}>
+    <Box sx={{marginInline: '5%', marginTop: '110px'}}>
       <Box
         sx={{
           display:'flex', 
@@ -113,8 +99,8 @@ function FoodDetails() {
         />
       </Paper>
 
-      <Typography mt={2} variant='h5'>Conversions:</Typography>
-      <Conversions/>
+      {/* <Typography mt={2} variant='h5'>Conversions:</Typography> */}
+      {/* <Conversions/> */}
     </Box>
   );
 

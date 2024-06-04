@@ -19,6 +19,7 @@ function CardList({ response }) {
             alignItems: 'center' 
             }}>
             <FoodCard 
+                data-cy={`food-card-${index}`}
                 label={item.food.label} 
                 id={item.food.foodId}
                 nutrients={item.food.nutrients}

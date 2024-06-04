@@ -7,17 +7,17 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import logo1 from '../assets/Logo/FoodBuddyLogo_White-01.png';
 import logo2 from '../assets/Logo/FoodBuddyLogo_White-02.png';
+import PersonIcon from '@mui/icons-material/Person';
 import { Link } from 'react-router-dom';
 
-const pages = ['home','foodInfo', 'about'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['home','foodInfo', 'about', 'profile'];
+const settings = ['profile'];
 
 
 function ResponsiveAppBar() {
@@ -41,7 +41,7 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
 
@@ -141,12 +141,16 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              <IconButton onClick={handleOpenUserMenu} sx={{ 
+                p: 0 
+                }}>
+                <PersonIcon sx={{ color: 'white' }} fontSize="large"/>
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: '45px' }}
+              sx={{ 
+                mt: '45px' 
+              }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{

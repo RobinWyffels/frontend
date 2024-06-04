@@ -1,14 +1,12 @@
-import LoginButton from "../../Auth/Login";
-import { useNavigate } from 'react-router-dom';
+// import { withAuth0 } from "@auth0/auth0-react";
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import backgroundImage from '../../assets/HomepageBackgroundDesktop.png';
-import Button from '@mui/material/Button'
+import Logout from "./Logout";
 
 
-function Home() {
-    const navigate = useNavigate();
+function Profile() {
     
+
     return (
         <Box sx={{
             display: 'flex',
@@ -18,23 +16,14 @@ function Home() {
             minHeight: '100vh',
             // width: '100vw',
             textAlign: 'center',
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'Cover',
-            backgroundPosition: 'center',
         
         }}>
             <Typography variant="h1" color="initial">Welcome to FoodBuddy!</Typography>
             <Typography variant="h4" color="initial">Feast on Facts</Typography>
             <Typography mt={2} mb={2} variant="body1" color="initial">try our food info and meny more features now for free!</Typography>
-            <Button onClick={() => navigate('/foodinfo')} size='large' variant="contained" color="primary" >
-              Try now
-            </Button >
-            <Box mt={4}/>
-            <LoginButton/>
-            
+            <Logout></Logout>
         </Box>
     );
 }
 
-export default Home;
+export default Profile;
