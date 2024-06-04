@@ -111,6 +111,7 @@ function FoodForm(){
                 marginBottom: '1%',
                 }}>   
                 <TextField
+                    data-cy="food-input"
                     id="food"
                     label="Food"
                     value={searchTerm}
@@ -119,6 +120,7 @@ function FoodForm(){
                     size='small'
                 />
                 <Button onClick={handleSearch}
+                    data-cy="food-search-button"
                     variant="contained"
                     color="primary"
                     type="submit"
