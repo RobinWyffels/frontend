@@ -1,27 +1,44 @@
 
 # Examenopdracht Front-end Web Development
 
-> Schrap hierboven wat niet past
-
 - Student: Robin Wyffels
-- Studentennummer: 
+- Studentennummer: 202079173
 - E-mailadres: <robin.wyffels@student.hogent.be>
 
-## Vereisten
+## Project Description
 
-Ik verwacht dat volgende software reeds geïnstalleerd is:
+This Project is meant to be a site where users can easely find information about a wide range of products. Users will then find a detailed page of the product they searched for with every nutritional value possible. Users also get the choice to get this information for a specific amound, to be selected by the user. This makes the website usefull for athletes, and people with specific diets.
+
+## Requirements
+
+the project requires the following programs:
 
 - [NodeJS](https://nodejs.org)
 - [Yarn](https://yarnpkg.com)
 - [MySQL Community Server](https://dev.mysql.com/downloads/mysql/)
-- ...
 
-> Vul eventueel aan
+## Installation Instructions
 
-## Opstarten
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/Web-IV/2223-webservices-RobinWyffels.git
+    ```
+2. Navigate to the project directory:
+    ```sh
+    cd .\FoodBuddy\
+    ```
+3. Install dependencies:
+    ```sh
+    yarn install
+    ```
 
-> Schrijf hier hoe we de applicatie starten (.env bestanden aanmaken, commando's om uit te voeren...)
+## Usage
+To start the development server, run:
+```sh
+yarn run dev
+```
 
-## Testen
-
-> Schrijf hier hoe we de testen uitvoeren (.env bestanden aanmaken, commando's om uit te voeren...)
+To run tests, use:
+```sh
+yarn run test
+```

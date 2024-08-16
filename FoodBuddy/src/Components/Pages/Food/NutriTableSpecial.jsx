@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import Typography from '@mui/material/Typography'
-import Divider from '@mui/material/Divider'
 import Box from '@mui/material/Box'
 import useSWR from 'swr'
 import { getNutrients } from '../../../api/foodApi'
@@ -10,7 +8,21 @@ import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Input from "@mui/material/Input";
+import DeviderLight from '../../../StyledComponents/DeviderLight'
+import DeviderBold from '../../../StyledComponents/DeviderBold'
+import BoldTypography from '../../../StyledComponents/BoldTypography';
+import TableCard from '../../../StyledComponents/TableCard';
+import { styled } from '@mui/system';
 
+
+
+const StyledRowBox = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: theme.spacing(4),
+}));
 
 
 
@@ -43,24 +55,19 @@ function NutriTableSpecial({ item }){
     // get data 
     const { data: itemData } = useSWR(itemInfo, getNutrients);
 
+    // Get the label of the selected MenuItem
+    const selectedLabel = item.uri[selectedUri]?.label || '';
+
+    // Extract keys from itemData?.totalNutrients and itemData?.totalDaily
+    const nutrientKeys = itemData ? Object.keys(itemData.totalNutrients) : [];
+
     return(
         <>
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                padding: 3,
-            
-            }}>
-                <Typography mb={1} variant="h4" sx={{fontWeight: 'bold'}}>Nutrition facts</Typography>
-                <Divider  aria-hidden="true" sx={{borderWidth: 2.5 , borderColor: "black"}} flexItem/>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        m: 4
-                    }}>
-                        <Typography variant="h6" color="initial" sx={{fontWeight: 'bold'}}>Quantity:</Typography>
+            <TableCard>
+                <BoldTypography mb={1} variant="h4">Nutrition facts</BoldTypography>
+                <DeviderBold  aria-hidden="true" flexItem/>
+                    <StyledRowBox>
+                        <BoldTypography variant="h6" color="initial">Quantity:</BoldTypography>
                         <Input sx={{ ml: 2, width: 60}}
                             id="value"
                             type="number"
@@ -76,53 +83,31 @@ function NutriTableSpecial({ item }){
                                 <MenuItem key={index} value={index}>{uri.label}</MenuItem>
                             ))}
                         </Select>
-                        
-                    </Box>
+                    </StyledRowBox>
                 
-                    <Divider  aria-hidden="true" sx={{borderWidth: 1.5 , borderColor: "black"}} flexItem/>
+                    <DeviderLight  aria-hidden="true" flexItem/>
                     <Grid container justifyContent="space-between" alignItems="center">
                         <Grid item xs={4} mt={2} mb={2}>
-                            <Typography variant="h5" sx={{fontWeight: 'bold'}}>Value</Typography>
+                            <BoldTypography variant="h5">Value</BoldTypography>
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="h5" align="right" sx={{fontWeight: 'bold'}}>/100g</Typography>   
+                            <BoldTypography variant="h5" align="right" >{itemInfo.quantity}{selectedLabel}</BoldTypography>   
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="h5" align="right" sx={{fontWeight: 'bold'}}>Daily value %</Typography>
+                            <BoldTypography variant="h5" align="right" >Daily value %</BoldTypography>
                         </Grid>
                     </Grid>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.CA} daily={itemData?.totalDaily.CA}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.CHOCDF} daily={itemData?.totalDaily.CHOCDF}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.CHOLE} daily={itemData?.totalDaily.CHOLE}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.ENERC_KCAL} daily={itemData?.totalDaily.ENERC_KCAL}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FAMS} daily={itemData?.totalDaily.FAMS}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FAPU} daily={itemData?.totalDaily.FAPU}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FASAT} daily={itemData?.totalDaily.FASAT}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FAT} daily={itemData?.totalDaily.FAT}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FIBTG} daily={itemData?.totalDaily.FIBTG}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FOLAC} daily={itemData?.totalDaily.FOLAC}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FOLDFE} daily={itemData?.totalDaily.FOLDFE}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.FOLFD} daily={itemData?.totalDaily.FOLFD}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.K} daily={itemData?.totalDaily.K}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.NA} daily={itemData?.totalDaily.NA}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.NIA} daily={itemData?.totalDaily.NIA}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.P} daily={itemData?.totalDaily.P}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.PROCNT} daily={itemData?.totalDaily.PROCNT}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.RIBF} daily={itemData?.totalDaily.RIBF}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.SUGAR} daily={itemData?.totalDaily.SUGAR}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.THIA} daily={itemData?.totalDaily.THIA}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.TOCPHA} daily={itemData?.totalDaily.TOCPHA}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITA_RAE} daily={itemData?.totalDaily.VITA_RAE}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITB6A} daily={itemData?.totalDaily.VITB6A}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITB12} daily={itemData?.totalDaily.VITB12}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITC} daily={itemData?.totalDaily.VITC}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITD} daily={itemData?.totalDaily.VITD}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.VITK1} daily={itemData?.totalDaily.VITK1}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.WATER} daily={itemData?.totalDaily.WATER}/>
-                    <NutritionRow loading={!itemData} total={itemData?.totalNutrients.ZN} daily={itemData?.totalDaily.ZN}/>
+                {nutrientKeys.map((key) => (
+                <NutritionRow
+                    key={key}
+                    loading={!itemData}
+                    total={itemData?.totalNutrients[key]}
+                    daily={itemData?.totalDaily[key]}
+                />
+                ))}
 
 
-            </Box>
+            </TableCard>
         </>
         
     )

@@ -2,6 +2,11 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
+import { styled } from '@mui/material/styles';
+
+const BoldTypography = styled(Typography)({
+    fontWeight: 'bold'
+});
 
 
 function NutritionRow({total, daily, loading = false}){
@@ -21,10 +26,10 @@ function NutritionRow({total, daily, loading = false}){
                 <Typography variant="body1" color="initial" >{nutrient}</Typography>
             </Grid>
             <Grid item xs={4}>
-                <Typography variant="body1" color="initial" align="right">{value}<Typography component="span" sx={{fontWeight: 'bold'}}>{unit}</Typography></Typography>
+                <Typography variant="body1" color="initial" align="right">{value}<BoldTypography component="span">{unit}</BoldTypography></Typography>
             </Grid>
             <Grid item xs={4}>
-                <Typography variant="body1" color="initial" align="right" >{dailyValue}<Typography component="span" sx={{fontWeight: 'bold'}}>{dailyUnit}</Typography></Typography>
+                <Typography variant="body1" color="initial" align="right" >{dailyValue}<BoldTypography component="span">{dailyUnit}</BoldTypography></Typography>
             </Grid>
         </Grid>
     )

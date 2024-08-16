@@ -23,3 +23,20 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('loginToAuth0', () => {
+  cy.request({
+    method: 'POST',
+    url: `https://${Cypress.env('auth0_domain')}/oauth/token`,
+    body: {
+      grant_type: 'password',
+      username: Cypress.env('auth0_username'),
+      password: Cypress.env('auth0_password'),
+      scope: 'openid',
+      client_id: Cypress.env('auth0_client_id'),
+      client_secret: 'ultYE02-Io36pgLeFQplVcq285AorKIuHPCW6sPhjRFN_-hO-9nn6HXpd6zHFDZh' // Replace with your actual client secret if needed
+    }
+  }).then((resp) => {
+    cy.setCookie('auth0_token', resp.body.access_token);
+  })
+});

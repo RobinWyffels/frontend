@@ -10,6 +10,25 @@ import Pagination from '@mui/material/Pagination';
 import useSWR from 'swr';
 import { searchFood, fetchNextData, isLastPage} from '../../../api/foodApi';
 import NoFoodFound from './NoFoodFound';
+import { styled } from '@mui/system';
+
+const StyledBox = styled(Box)({
+    marginTop: '100px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+
+});
+
+const StyledForm = styled('form')({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '6%',
+    marginBottom: '1%',
+});
+
 
 function FoodForm(){
     //variables
@@ -18,6 +37,7 @@ function FoodForm(){
     const [food, setFood] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     //pagination variables
     const [numberOfPages, setNumberOfPages] = useState(2);
@@ -34,9 +54,15 @@ function FoodForm(){
     //#region
     const handleInputChange = (event) => {
         setSearchTerm(event.target.value);
+        setErrorMessage('');
     }
 
-    const handleSearch = () => {
+    const handleSearch = (event) => {
+        event.preventDefault();
+        if (searchTerm.trim() === '') {
+            setErrorMessage('Field cannot be empty');
+            return;
+        }
         setFood(searchTerm)
     }
 
@@ -92,24 +118,12 @@ function FoodForm(){
     //#endregion
 
     return (
-        <Box style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'column',
-        }}>
+        <StyledBox>
             <Typography variant="h4">
                 Search for any food item, brand or product
             </Typography>
 
-            <form  
-                style={{ 
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '6%',
-                marginBottom: '1%',
-                }}>   
+            <StyledForm>   
                 <TextField
                     data-cy="food-input"
                     id="food"
@@ -118,6 +132,8 @@ function FoodForm(){
                     onChange={handleInputChange}
                     variant="outlined"
                     size='small'
+                    error={!!errorMessage}
+                    helperText={errorMessage}
                 />
                 <Button onClick={handleSearch}
                     data-cy="food-search-button"
@@ -126,11 +142,11 @@ function FoodForm(){
                     type="submit"
                     size='large'
                     style={{ marginLeft: '10px' }}
-                    disabled={isValidating || isLoading}
+                    disabled={isValidating || isLoading || searchTerm.trim() === ''}
                 >
                     {isValidating || isLoading ? <CircularProgress size={24} /> : 'Fetch Food'}
                 </Button> 
-            </form>
+            </StyledForm>
 
             <Typography variant="h4">
                 Response:
@@ -154,7 +170,7 @@ function FoodForm(){
                     }
                 </Box>
             )}
-        </Box>
+        </StyledBox>
     );
 }
 

@@ -14,14 +14,17 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import logo1 from '../assets/Logo/FoodBuddyLogo_White-01.png';
 import logo2 from '../assets/Logo/FoodBuddyLogo_White-02.png';
 import PersonIcon from '@mui/icons-material/Person';
+import Avatar from '@mui/material/Avatar';
 import { Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 
-const pages = ['home','foodInfo', 'about', 'profile'];
+const pages = ['home','foodInfo', 'about'];
 const settings = ['profile'];
 
 
 function ResponsiveAppBar() {
   const matches = useMediaQuery('(max-width:340px)');
+  const { user, isAuthenticated } = useAuth0();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -141,11 +144,13 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ 
-                p: 0 
-                }}>
-                <PersonIcon sx={{ color: 'white' }} fontSize="large"/>
-              </IconButton>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  {isAuthenticated ? (
+                    <Avatar alt={user.name} src={user.picture} />
+                  ) : (
+                    <PersonIcon sx={{ color: 'white' }} fontSize="large" />
+                  )}
+                </IconButton>
             </Tooltip>
             <Menu
               sx={{ 

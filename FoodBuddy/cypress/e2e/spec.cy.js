@@ -5,27 +5,50 @@ describe('check to see if website is up', () => {
   })
 })
 
+
 describe('FoodForm', () => {
   beforeEach(() => {
+    cy.loginToAuth0();
     cy.visit('http://localhost:5173/foodinfo');
   });
 
-  it('renders the form correctly', () => {
-    cy.get('form').should('exist');
-    cy.get('input#food').should('exist');
-    cy.get('button').contains('Fetch Food').should('exist');
+  it('should display the food search input and button', () => {
+    cy.get('[data-cy="food-input"]').should('be.visible');
+    cy.get('[data-cy="food-search-button"]').should('be.visible');
   });
 
-  it('handles input and fetches data', () => {
-    cy.get('input#food').type('apple');
-    cy.get('button').contains('Fetch Food').click();
-    
+  it('should update the input value when typing', () => {
+    cy.get('[data-cy="food-input"]').type('apple').should('have.value', 'apple');
   });
 
-  it('displays the response correctly', () => {
-    cy.get('[data-cy=food-input]').type("apple");
-    cy.get('[data-cy=food-search-button]').click();
-    cy.wait('@getFood');
-    cy.get('[data-cy=food-card-0]').contains("apple");
+  it('should trigger search on button click', () => {
+    cy.get('[data-cy="food-input"]').type('apple');
+    cy.get('[data-cy="food-search-button"]').click();
+    cy.get('[data-cy="food-search-button"]').should('be.disabled');
+  });
+
+  it('should display search results', () => {
+    cy.get('[data-cy="food-input"]').type('apple');
+    cy.get('[data-cy="food-search-button"]').click();
+    cy.get('.card-list').should('be.visible'); 
+  });
+
+  it('should handle pagination', () => {
+    cy.get('[data-cy="food-input"]').type('apple');
+    cy.get('[data-cy="food-search-button"]').click();
+    cy.get('.pagination').should('be.visible');
+    cy.get('.pagination').contains('2').click();
+    cy.get('.card-list').should('be.visible');
+  });
+
+  it('should display error message for empty input', () => {
+    cy.get('[data-cy="food-search-button"]').click();
+    cy.get('.MuiFormHelperText-root').should('contain', 'Field cannot be empty');
+  });
+
+  it('should display NoFoodFound component for invalid search', () => {
+    cy.get('[data-cy="food-input"]').type('invalidfoodterm');
+    cy.get('[data-cy="food-search-button"]').click();
+    cy.get('.no-food-found').should('be.visible');
   });
 });

@@ -9,7 +9,31 @@ import { styled } from '@mui/material/styles';
 import ConstructionImage from '../../assets/95406ac9-a21e-4fe3-8c5c-324b4a611861.jpeg'
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
-// import ConstructionIcon from '@mui/icons-material/Construction';
+
+const StyledBox = styled(Box)({
+    width: '100%',
+  });
+
+  
+const StyledDiv = styled('div')({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop:'30px'
+  });
+
+// const StyledImageBox = styled(Box)(({ theme }) => ({
+// width: '60%', // default for mobile
+// display: 'flex',
+// justifyContent: 'center',
+// alignItems: 'center',
+// [theme.breakpoints.up('sm')]: {
+//     width: '40%', // on tablets and larger
+// },
+// [theme.breakpoints.up('md')]: {
+//     width: '30%', // on small laptops
+// },
+// }));
 
 export default function TransitionAlerts() {
 const [open, setOpen] = React.useState(true);
@@ -19,7 +43,7 @@ const Image = styled('img')({
 
     return (
         <div>
-            <Box sx={{ width: '100%' }}>
+            <StyledBox>
                 <Collapse in={open}>
                     <Alert severity='info' color='warning'
                         action={
@@ -44,8 +68,8 @@ const Image = styled('img')({
                         It seems that you have entered a construction site.
                     </Alert>
                 </Collapse>
-            </Box>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop:'30px' }}>
+            </StyledBox>
+            <StyledDiv>
                 <Box
                     sx={{
                         width: {
@@ -60,10 +84,10 @@ const Image = styled('img')({
                 >
                     <Image src={ConstructionImage} alt="An image of a Construction site"/>
                 </Box>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop:'30px' }}>
+            </StyledDiv>
+            <StyledDiv>
                 <Button variant="contained" component={Link} to="/">Go Home</Button>
-            </div>
+            </StyledDiv>
         </div>
         
     );
