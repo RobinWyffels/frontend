@@ -4,8 +4,8 @@ const api = axios.create({
   baseURL: 'https://api.edamam.com/api/food-database/v2/',
 });
 
-const FOOD_APP_ID = import.meta.env.VITE_API_ID;
-const FOOD_APP_KEY = import.meta.env.VITE_API_KEY;
+const FOOD_APP_ID = "45be9297";
+const FOOD_APP_KEY = "c3ca97f64d4e593ddd79f064eb855fba";
 
 // Variable to store the next link for pagination
 let nextLink = null;
